@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             padding: 20px 15px;
@@ -16,29 +16,32 @@
         .chat-container {
             background: white;
             width: 100%;
-            max-width: 500px;
-            height: 85vh;
+            max-width: 520px;
+            height: 90vh;
             display: flex;
             flex-direction: column;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             overflow: hidden;
         }
         .chat-header {
-            background: #2563eb;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
-            padding: 12px 15px;
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .chat-title {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .lang-select {
-            padding: 5px 8px;
-            border-radius: 4px;
+            padding: 6px 10px;
+            border-radius: 6px;
             border: none;
             background: white;
             color: #2563eb;
@@ -46,57 +49,88 @@
             cursor: pointer;
             outline: none;
         }
+        .quick-actions {
+            display: flex;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .action-btn {
+            background: #white;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
         .chat-messages {
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            background: #f9fafb;
+            gap: 12px;
+            background: #f8fafc;
         }
         .message {
-            padding: 10px 14px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
             max-width: 80%;
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
+            word-wrap: break-word;
         }
         .user-message {
             background: #2563eb;
             color: white;
             align-self: flex-end;
+            border-bottom-right-radius: 2px;
         }
         .ai-message {
-            background: #e5e7eb;
-            color: #1f2937;
+            background: #e2e8f0;
+            color: #0f172a;
             align-self: flex-start;
+            border-bottom-left-radius: 2px;
         }
         .chat-input-area {
             display: flex;
             padding: 12px;
             background: white;
-            border-top: 1px solid #e5e7eb;
-            gap: 10px;
+            border-top: 1px solid #e2e8f0;
+            gap: 8px;
         }
         input[type="text"] {
             flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             outline: none;
             font-size: 14px;
         }
-        button {
-            padding: 10px 18px;
+        input[type="text"]:focus {
+            border-color: #2563eb;
+        }
+        .send-btn {
+            padding: 12px 20px;
             background: #2563eb;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
         }
-        button:hover {
+        .send-btn:hover {
             background: #1d4ed8;
         }
     </style>
@@ -104,9 +138,9 @@
 <body>
 
     <div class="chat-container">
-        <!-- Top-Right Language Switcher Header -->
+        <!-- Top Language Header -->
         <div class="chat-header">
-            <span class="chat-title" id="headerTitle">Buraq AI Assistant</span>
+            <span class="chat-title" id="headerTitle">⚡ Buraq AI Assistant</span>
             <select id="langSelect" class="lang-select" onchange="changeLanguage()">
                 <option value="en">English</option>
                 <option value="ur">Urdu</option>
@@ -117,61 +151,88 @@
             </select>
         </div>
 
+        <!-- Quick Shortcut Actions -->
+        <div class="quick-actions">
+            <button class="action-btn" onclick="sendQuickMsg('Tell me a funny joke')">😄 Joke</button>
+            <button class="action-btn" onclick="sendQuickMsg('I am feeling very bored')">🎮 I\'m Bored</button>
+            <button class="action-btn" onclick="sendQuickMsg('Let\'s play a quiz game')">🧠 Quiz Game</button>
+            <button class="action-btn" onclick="sendQuickMsg('Help me with HTML code')">💻 Code Helper</button>
+            <button class="action-btn" onclick="sendQuickMsg('I am hungry')">🍕 Hungry</button>
+        </div>
+
         <div class="chat-messages" id="chatMessages">
-            <div class="message ai-message" id="welcomeMsg">Hey there! I'm Buraq AI, your friendly buddy. What's on your mind today?</div>
+            <div class="message ai-message" id="welcomeMsg">Hey buddy! I'm Buraq AI, your web companion. Chat with me, ask for code, play a game, or tell me how you feel!</div>
         </div>
 
         <div class="chat-input-area">
             <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKey(event)">
-            <button id="sendBtn" onclick="sendMessage()">Send</button>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
         const translations = {
             en: {
-                title: "Buraq AI Assistant",
-                welcome: "Hey there! I'm Buraq AI, your friendly buddy. What's on your mind today?",
+                title: "⚡ Buraq AI Assistant",
+                welcome: "Hey buddy! I'm Buraq AI, your web companion. Chat with me, ask for code, play a game, or tell me how you feel!",
                 placeholder: "Type your message here...",
                 send: "Send",
                 thinking: "Buraq is thinking..."
             },
             ur: {
-                title: "براق اے آئی اسسٹنٹ",
-                welcome: "ارے دوست! میں براق اے آئی ہوں، آپ کا یار۔ بتائیے آج کیا چل رہا ہے ذہن میں؟",
+                title: "⚡ براق اے آئی اسسٹنٹ",
+                welcome: "ارے دوست! میں براق اے آئی ہوں۔ مجھ سے بات کرو، کوڈنگ سیکھو، گیم کھیلو یا جو دل چاہے بتاؤ!",
                 placeholder: "یہاں اپنا پیغام لکھیں...",
                 send: "بھیجیں",
                 thinking: "براق سوچ رہا ہے..."
             },
             ar: {
-                title: "مساعد براق الذكي",
-                welcome: "أهلاً بك! أنا مساعد براق، صديقك المخلص. بماذا يمكنني مساعدتك اليوم؟",
+                title: "⚡ مساعد براق الذكي",
+                welcome: "أهلاً بك! أنا مساعد براق. تحدث معي، اطلب مني الأكواد البرمجية، أو نلعب لعبة معاً!",
                 placeholder: "اكتب رسالتك هنا...",
                 send: "إرسال",
                 thinking: "جاري التفكير..."
             },
             hi: {
-                title: "बुराक़ एआई सहायक",
-                welcome: "अरे दोस्त! मैं बुराक़ एआई हूँ, आपका यार। बताइए आज क्या बात करनी है?",
+                title: "⚡ बुराक़ एआई सहायक",
+                welcome: "अरे दोस्त! मैं बुराक़ एआई हूँ। मुझसे बात करो, कोड सीखो, या गेम खेलो!",
                 placeholder: "यहाँ अपना संदेश लिखें...",
                 send: "भेजें",
                 thinking: "सोच रहा हूँ..."
             },
             es: {
-                title: "Asistente Buraq AI",
-                welcome: "¡Hola amigo! Soy Buraq AI, tu compas. ¿De qué quieres hablar hoy?",
+                title: "⚡ Asistente Buraq AI",
+                welcome: "¡Hola amigo! Soy Buraq AI. Chatea conmigo, pídeme código o juguemos a algo divertido.",
                 placeholder: "Escribe tu mensaje aquí...",
                 send: "Enviar",
                 thinking: "Pensando..."
             },
             fr: {
-                title: "Assistant Buraq AI",
-                welcome: "Salut mon ami ! Je suis Buraq AI, ton pote. De quoi veut-on parler ?",
+                title: "⚡ Assistant Buraq AI",
+                welcome: "Salut mon pote ! Je suis Buraq AI. On peut discuter, coder ou jouer ensemble !",
                 placeholder: "Tapez votre message ici...",
                 send: "Envoyer",
                 thinking: "En train de réfléchir..."
             }
         };
+
+        const jokes = {
+            en: [
+                "Why don't programmers like nature? It has too many bugs! 😂",
+                "Why did the computer go to the doctor? Because it had a virus! 🖥️😷",
+                "Parallel lines have so much in common. It's a shame they'll never meet! 😄"
+            ],
+            ur: [
+                "استاد: بتاؤ ناکام اور کامیاب انسان میں کیا فرق ہے؟\nشاگرد: ناکام موبائل چارجر ڈھونڈتا ہے، اور کامیاب چارجر لگا کر سو جاتا ہے! 😂",
+                "دوست 1: یار میں جو بھی سوچتا ہوں بھول جاتا ہوں۔\nدوست 2: کب سے؟\nدوست 1: کیا کب سے؟ 😂"
+            ]
+        };
+
+        const quizzes = [
+            { q: "Which planet is known as the Red Planet? (A) Mars (B) Venus", a: "A" },
+            { q: "What does HTML stand for? (A) HyperText Markup Language (B) High Tech Multi Language", a: "A" },
+            { q: "How many hours are there in a day? (A) 12 (B) 24", a: "B" }
+        ];
 
         function changeLanguage() {
             const lang = document.getElementById('langSelect').value;
@@ -187,89 +248,76 @@
             }
         }
 
-        // Super Smart Contextual & Friendly Replies
+        function sendQuickMsg(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
         function getSmartReply(text, lang) {
             const t = text.toLowerCase();
-            
-            // 1. Greetings
+
+            // 1. Jokes
+            if (t.includes('joke') || t.includes('latifa') || t.includes('chutkula')) {
+                const list = jokes[lang] || jokes['en'];
+                return list[Math.floor(Math.random() * list.length)];
+            }
+
+            // 2. Quiz / Game
+            if (t.includes('quiz') || t.includes('game') || t.includes('khel')) {
+                const quiz = quizzes[Math.floor(Math.random() * quizzes.length)];
+                return `🎯 Quiz Time:\n${quiz.q}\n\nType your choice!`;
+            }
+
+            // 3. Coding Helper
+            if (t.includes('code') || t.includes('html') || t.includes('css') || t.includes('javascript') || t.includes('program')) {
+                if (lang === 'ur') return "💻 کوڈنگ میں کیا مدد چاہیے دوست؟ میں HTML, CSS, JavaScript اور Python کا بنیادی کوڈ لکھ سکتا ہوں!";
+                return "💻 Need coding help? Ask me to write HTML, CSS, JavaScript or basic Python code for you!";
+            }
+
+            // 4. Greetings
             if (t.includes('hi') || t.includes('hello') || t.includes('salam') || t.includes('hey') || t.includes('assalam')) {
                 if (lang === 'ur') return "وعلیکم السلام یار! سناؤ کیسے ہو؟ سب خیریت ہے؟";
                 if (lang === 'ar') return "أهلاً وسهلاً! كيف حالك يا صديقي؟";
                 if (lang === 'hi') return "नमस्ते यार! कैसे हो सब ठीक-ठाक?";
-                if (lang === 'es') return "¡Hola amigo! ¿Qué tal todo?";
                 return "Hey buddy! So good to hear from you. How's it going?";
             }
-            
-            // 2. Name / Identity
-            if (t.includes('name') || t.includes('naam') || t.includes('kaun ho')) {
-                if (lang === 'ur') return "مرا نام براق اے آئی ہے، اور میں ہر وقت آپ کا دوست بن کر بات کرنے کے لیے حاضر ہوں!";
-                if (lang === 'hi') return "मेरा नाम बुराक़ एआई है, और मैं आपका पक्का दोस्त हूँ!";
-                return "I'm Buraq AI, your personal buddy! Always here to chat and help you out.";
-            }
 
-            // 3. Boredom (Bore hona)
+            // 5. Boredom
             if (t.includes('bore') || t.includes('boring') || t.includes('farigh')) {
-                if (lang === 'ur') return "اچھا! بور ہو رہے ہو؟ چلو کوئی گیم کھیلیں، یا کسی مزے دار ٹاپک پر گپ شپ لگاتے ہیں!";
-                if (lang === 'hi') return "अरे बोर हो रहे हो? चलो कोई मजेदार बात करते हैं या कोई चुटकुला सुनाऊँ?";
-                if (lang === 'es') return "¡Vaya, aburrido! ¿Jugamos a algo o charlamos de algo divertido?";
-                return "Feeling bored? Let's fix that! We can chat about a cool topic, or I can tell you a joke. What do you prefer?";
+                if (lang === 'ur') return "اوہو! بور ہو رہے ہو؟ چلو اوپر 'Quiz Game' یا 'Joke' wale button par click karo, maza aaye ga!";
+                return "Bored? Let's fix that! Click the 'Quiz Game' or 'Joke' button above to have some fun! 🎮";
             }
 
-            // 4. Hunger (Bhook lagna)
+            // 6. Hunger
             if (t.includes('hungry') || t.includes('bhook') || t.includes('khana') || t.includes('eat')) {
-                if (lang === 'ur') return "اوہو، بھوک لگ گئی! جلدی سے جا کر کچھ مزے دار کھا کر آؤ، یا بتاؤ کیا کھانے کا دل چاہ رہا ہے؟";
-                if (lang === 'hi') return "ओहो, भूख लग गई! जल्दी से कुछ टेस्टी खा लो यार, क्या खाने का मन है?";
-                return "Oh, hungry?! Time to grab some delicious food! What are you planning to eat?";
+                if (lang === 'ur') return "اوہو، بھوک لگ گئی! جلدی سے جا کر کچھ مزے دار پیزا یا برگر کھا لو 🍕🍔!";
+                return "Hungry?! Time to grab a delicious pizza or burger 🍕🍔!";
             }
 
-            // 5. Money / Rupees / Budget (Pese hona)
+            // 7. Money
             if (t.includes('rupeis') || t.includes('rupee') || t.includes('pese') || t.includes('money') || t.includes('cash')) {
-                if (lang === 'ur') return "واہ بھائی! اتنے پیسوں میں تو کوئی زبردست سی ٹریٹ بنتی ہے یا چھوٹی موٹی مزیدار چیز آ سکتی ہے!";
-                if (lang === 'hi') return "अरे वाह! इतने पैसों में तो कोई बढ़िया सी छोटी-मोटी ट्रीट बनती है यार!";
-                return "Nice! With that amount, you can definitely treat yourself to something nice or save it for a rainy day!";
+                if (lang === 'ur') return "واہ بھائی! اتنے پیسوں میں تو زبردست چائے اور سموسے کا پروگرام بن سکتا ہے ☕!";
+                return "Awesome! That's enough for a nice cup of tea or a quick snack ☕!";
             }
 
-            // General Random Friendly Replies
+            // Fallback Friendly Dynamic Replies
             const replies = {
                 en: [
                     "That's super interesting! Tell me more about it, I'm all ears.",
-                    "Haha, wow! I never thought of it that way. What else is on your mind?",
+                    "Haha, wow! I like how you think. What else is on your mind?",
                     "That sounds awesome, buddy! How can I help you take it further?",
-                    "Hmm, fascinating point! Let's chat more about this.",
-                    "You always come up with cool topics! What's next?"
+                    "Hmm, fascinating point! Let's chat more about this."
                 ],
                 ur: [
                     "واہ یار! یہ تو بڑی زبردست بات کہی آپ نے، اس بارے میں اور بتاؤ۔",
                     "ہیہا! یہ واقعی مزے کی بات ہے۔ اور بتاؤ آج کیا پلان ہے؟",
                     "یہ تو کمال ہو گیا! اس میں میں آپ کی کیا مدد کر سکتا ہوں؟",
-                    "ہممم، بالکل صحیح کہا! دوست کی طرح کہوں تو یہ ائیڈیا کافی شاندار ہے۔",
                     "آپ کی باتیں واقعی دل کو لگتی ہیں! اور سناؤ کیا چل رہا ہے؟"
-                ],
-                ar: [
-                    "هذا مذهل حقاً! أخبرني المزيد عن هذا الموضوع يا صديقي.",
-                    "هذا رائع! ما هي أفكارك الأخرى اليوم؟",
-                    "أعجبني ما تقول! كيف يمكنني مساعدتك أكثر؟"
-                ],
-                hi: [
-                    "वाह यार! यह बहुत बढ़िया बात बोली आपने, इसके बारे में और बताओ।",
-                    "हाहा, सच में! यह काफी दिलचस्प है। आगे क्या सोचा है?",
-                    "मज़ा आ गया सुन कर! इसमें मैं क्या मदद करूँ?"
-                ],
-                es: [
-                    "¡Eso es súper interesante! Cuéntame más, amigo.",
-                    "¡Jaja, qué genial! ¿Qué más tienes en mente hoy?",
-                    "¡Me encanta esa idea! ¿Cómo te ayudo con eso?"
-                ],
-                fr: [
-                    "C'est super intéressant ! Dis-m'en plus, mon pote.",
-                    "Haha, génial ! Qu'est-ce d'autre te préoccupe aujourd'hui ?",
-                    "J'adore ton idée ! Comment on avance ?"
                 ]
             };
 
             const langReplies = replies[lang] || replies['en'];
-            const randomIndex = Math.floor(Math.random() * langReplies.length);
-            return langReplies[randomIndex];
+            return langReplies[Math.floor(Math.random() * langReplies.length)];
         }
 
         function sendMessage() {
@@ -297,7 +345,7 @@
             setTimeout(() => {
                 aiMsgDiv.textContent = getSmartReply(messageText, lang);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1000);
+            }, 800);
         }
     </script>
 
