@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buraq AI Assistant - Live</title>
+    <title>Buraq AI Assistant</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -36,22 +36,15 @@
             font-weight: bold;
             font-size: 18px;
         }
-        .api-settings {
-            padding: 8px 12px;
-            background: #fffbeb;
-            border-bottom: 1px solid #fde68a;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            font-size: 13px;
-        }
-        .api-settings input {
-            flex-grow: 1;
+        .lang-select {
             padding: 6px 10px;
-            border: 1px solid #cbd5e1;
             border-radius: 6px;
+            border: none;
+            background: white;
+            color: #2563eb;
+            font-weight: bold;
+            cursor: pointer;
             outline: none;
-            font-size: 12px;
         }
         .chat-messages {
             flex-grow: 1;
@@ -69,7 +62,6 @@
             font-size: 14px;
             line-height: 1.5;
             word-wrap: break-word;
-            white-space: pre-wrap;
         }
         .user-message {
             background: #2563eb;
@@ -117,49 +109,174 @@
     <div class="chat-container">
         <!-- Header -->
         <div class="chat-header">
-            <span class="chat-title">⚡ Buraq Live AI</span>
+            <span class="chat-title" id="headerTitle">⚡ Buraq AI Assistant</span>
+            <select id="langSelect" class="lang-select" onchange="changeLanguage()">
+                <option value="en">English</option>
+                <option value="ur">Urdu</option>
+                <option value="ar">العربية</option>
+                <option value="hi">हिन्दी</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+            </select>
         </div>
 
-        <!-- API Key Input Bar (Yahan apni free Groq/OpenRouter key dalni hogi) -->
-        <div class="api-settings">
-            <span style="font-weight: bold; color: #92400e;">API Key:</span>
-            <input type="password" id="apiKeyInput" placeholder="Paste your Free API Key here (e.g. Groq/OpenRouter)">
-        </div>
-
-        <!-- Messages Area -->
+        <!-- Messages -->
         <div class="chat-messages" id="chatMessages">
-            <div class="message ai-message">Hey buddy! I am your live Buraq AI assistant. Please enter your free AI API key above to start chatting with me in real-time!</div>
+            <div class="message ai-message" id="welcomeMsg">Hey buddy! I am Buraq AI, your friendly companion. What's on your mind today?</div>
         </div>
 
-        <!-- Input Area -->
+        <!-- Input -->
         <div class="chat-input-area">
-            <input type="text" id="userInput" placeholder="Ask me anything..." onkeypress="handleKey(event)">
-            <button class="send-btn" onclick="sendMessage()">Send</button>
+            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKey(event)">
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
+        const translations = {
+            en: {
+                title: "⚡ Buraq AI Assistant",
+                welcome: "Hey buddy! I am Buraq AI, your friendly companion. What's on your mind today?",
+                placeholder: "Type your message here...",
+                send: "Send",
+                thinking: "Buraq is thinking..."
+            },
+            ur: {
+                title: "⚡ براق اے آئی اسسٹنٹ",
+                welcome: "ارے دوست! میں براق اے آئی ہوں۔ بتائیے آج کیا چل رہا ہے ذہن میں؟",
+                placeholder: "یہاں اپنا پیغام لکھیں...",
+                send: "بھیجیں",
+                thinking: "براق سوچ رہا ہے..."
+            },
+            ar: {
+                title: "⚡ مساعد براق الذكي",
+                welcome: "أهلاً بك! أنا مساعد براق، صديقك. بماذا يمكنني مساعدتك اليوم؟",
+                placeholder: "اكتب رسالتك هنا...",
+                send: "إرسال",
+                thinking: "جاري التفكير..."
+            },
+            hi: {
+                title: "⚡ बुराक़ एआई सहायक",
+                welcome: "अरे दोस्त! मैं बुराक़ एआई हूँ। बताइए आज क्या बात करनी है?",
+                placeholder: "यहाँ अपना संदेश लिखें...",
+                send: "भेजें",
+                thinking: "सोच रहा हूँ..."
+            },
+            es: {
+                title: "⚡ Asistente Buraq AI",
+                welcome: "¡Hola amigo! Soy Buraq AI, tu compas. ¿De qué quieres hablar hoy?",
+                placeholder: "Escribe tu mensaje aquí...",
+                send: "Enviar",
+                thinking: "Pensando..."
+            },
+            fr: {
+                title: "⚡ Assistant Buraq AI",
+                welcome: "Salut mon ami ! Je suis Buraq AI. De quoi veut-on parler ?",
+                placeholder: "Tapez votre message ici...",
+                send: "Envoyer",
+                thinking: "En train de réfléchir..."
+            }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSelect').value;
+            document.getElementById('headerTitle').textContent = translations[lang].title;
+            document.getElementById('welcomeMsg').textContent = translations[lang].welcome;
+            document.getElementById('userInput').placeholder = translations[lang].placeholder;
+            document.getElementById('sendBtn').textContent = translations[lang].send;
+        }
+
         function handleKey(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         }
 
-        async function sendMessage() {
+        function getSmartReply(text, lang) {
+            const t = text.toLowerCase();
+
+            // Greetings
+            if (t.includes('hi') || t.includes('hello') || t.includes('salam') || t.includes('hey') || t.includes('assalam')) {
+                if (lang === 'ur') return "وعلیکم السلام یار! سناؤ کیسے ہو؟ سب خیریت ہے؟";
+                if (lang === 'ar') return "أهلاً وسهلاً! كيف حالك يا صديقي؟";
+                if (lang === 'hi') return "नमस्ते यार! कैसे हो सब ठीक-ठाक?";
+                return "Hey buddy! So good to hear from you. How's it going?";
+            }
+
+            // Boredom
+            if (t.includes('bore') || t.includes('boring') || t.includes('farigh')) {
+                if (lang === 'ur') return "اچھا! بور ہو رہے ہو؟ چلو کوئی مزے دار گپ شپ لگاتے ہیں یا کوئی گیم کھیلیں؟";
+                return "Feeling bored? Let's chat about something fun! What's your favorite hobby?";
+            }
+
+            // Hunger
+            if (t.includes('hungry') || t.includes('bhook') || t.includes('khana') || t.includes('eat')) {
+                if (lang === 'ur') return "اوہو، بھوک لگ گئی! جلدی سے جا کر کچھ مزے دار کھا لو 🍕🍔!";
+                return "Oh, hungry?! Time to grab some delicious food! What are you planning to eat? 🍕";
+            }
+
+            // Money / Rupees
+            if (t.includes('rupeis') || t.includes('rupee') || t.includes('pese') || t.includes('money') || t.includes('cash')) {
+                if (lang === 'ur') return "واہ بھائی! اتنے پیسوں میں تو زبردست چائے اور سموسے کا مزہ آ جائے گا ☕!";
+                return "Awesome! That's enough for a nice treat or a quick snack!";
+            }
+
+            // Name
+            if (t.includes('name') || t.includes('naam') || t.includes('kaun ho')) {
+                if (lang === 'ur') return "میرا نام براق اے آئی ہے، آپ کا پکا دوست!";
+                return "I'm Buraq AI, your friendly web companion!";
+            }
+
+            // General Replies
+            const replies = {
+                en: [
+                    "That's super interesting! Tell me more about it, I'm all ears.",
+                    "Haha, wow! I never thought of it that way. What else is on your mind?",
+                    "That sounds awesome, buddy! How can I help you take it further?",
+                    "Hmm, fascinating point! Let's chat more about this.",
+                    "You always come up with cool topics! What's next?"
+                ],
+                ur: [
+                    "واہ یار! یہ تو بڑی زبردست بات کہی آپ نے، اس بارے میں اور بتاؤ۔",
+                    "ہیہا! یہ واقعی مزے کی بات ہے۔ اور بتاؤ آج کیا پلان ہے؟",
+                    "یہ تو کمال ہو گیا! اس میں میں آپ کی کیا مدد کر سکتا ہوں؟",
+                    "ہممم، بالکل صحیح کہا! دوست کی طرح کہوں تو یہ ائیڈیا کافی شاندار ہے۔",
+                    "آپ کی باتیں واقعی دل کو لگتی ہیں! اور سناؤ کیا چل रहा ہے؟"
+                ],
+                ar: [
+                    "هذا مذهل حقاً! أخبرني المزيد عن هذا الموضوع يا صديقي.",
+                    "هذا رائع! ما هي أفكارك الأخرى اليوم؟",
+                    "أعجبني ما تقول! كيف يمكنني مساعدتك أكثر؟"
+                ],
+                hi: [
+                    "वाह यार! यह बहुत बढ़िया बात बोली आपने, इसके बारे में और बताओ।",
+                    "हाहा, सच में! यह काफी दिलचस्प है। आगे क्या सोचा है?",
+                    "मज़ा आ गया सुन कर! इसमें मैं क्या मदद करूँ?"
+                ],
+                es: [
+                    "¡Eso es súper interesante! Cuéntame más, amigo.",
+                    "¡Jaja, qué genial! ¿Qué más tienes en mente hoy?",
+                    "¡Me encanta esa idea! ¿Cómo te ayudo con eso?"
+                ],
+                fr: [
+                    "C'est super intéressant ! Dis-m'en plus, mon pote.",
+                    "Haha, génial ! Qu'est-ce d'autre te préoccupe aujourd'hui ?",
+                    "J'adore ton idée ! Comment on avance ?"
+                ]
+            };
+
+            const langReplies = replies[lang] || replies['en'];
+            return langReplies[Math.floor(Math.random() * langReplies.length)];
+        }
+
+        function sendMessage() {
             const inputField = document.getElementById('userInput');
-            const apiKeyInput = document.getElementById('apiKeyInput');
             const messageText = inputField.value.trim();
             const chatMessages = document.getElementById('chatMessages');
-            const apiKey = apiKeyInput.value.trim();
+            const lang = document.getElementById('langSelect').value;
 
             if (messageText === '') return;
 
-            if (!apiKey) {
-                alert("Please enter your API key in the top yellow bar first!");
-                return;
-            }
-
-            // User Message Display
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'message user-message';
             userMsgDiv.textContent = messageText;
@@ -168,44 +285,16 @@
             inputField.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Thinking Message
             const aiMsgDiv = document.createElement('div');
             aiMsgDiv.className = 'message ai-message';
-            aiMsgDiv.textContent = "Buraq is thinking...";
+            aiMsgDiv.textContent = translations[lang].thinking;
             chatMessages.appendChild(aiMsgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            try {
-                // Using OpenRouter / OpenAI compatible endpoint (Groq is super fast and free!)
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        "model": "google/gemma-2-9b-it:free", // Free and fast model
-                        "messages": [
-                            {"role": "system", "content": "You are Buraq AI, a friendly, casual, smart buddy assistant who talks nicely and helps with everything."},
-                            {"role": "user", "content": messageText}
-                        ]
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.choices && data.choices.length > 0) {
-                    aiMsgDiv.textContent = data.choices[0].message.content;
-                } else if (data.error) {
-                    aiMsgDiv.textContent = "Error: " + (data.error.message || "Invalid API Key");
-                } else {
-                    aiMsgDiv.textContent = "Oops! Something went wrong with the API response.";
-                }
-            } catch (error) {
-                aiMsgDiv.textContent = "Connection failed! Check your internet or API key.";
-            }
-
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            setTimeout(() => {
+                aiMsgDiv.textContent = getSmartReply(messageText, lang);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 800);
         }
     </script>
 
