@@ -176,7 +176,7 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                // Using Groq's super fast and universally accessible free model
+                // Using Groq's active free model
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: {
@@ -184,7 +184,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        "model": "llama-3.1-8b-instant",
+                        "model": "llama-3.2-3b-preview",
                         "messages": [
                             {"role": "system", "content": "You are Buraq AI, a friendly, casual, smart buddy assistant."},
                             {"role": "user", "content": messageText}
