@@ -114,20 +114,25 @@
 
         <!-- Messages Area -->
         <div class="chat-messages" id="chatMessages">
-            <div class="message ai-message">Assalam-o-Alaikum! Main Buraq AI hoon. Poochhiye kya poochhna chahte hain?</div>
+            <div class="message ai-message">Assalam-o-Alaikum! Main Buraq AI hoon. Aap kis language ya history ke baray mein baat karna chahte hain?</div>
         </div>
 
         <!-- Input Area -->
         <div class="chat-input-area">
-            <input type="text" id="userInput" placeholder="Ask me anything..." onkeypress="handleKey(event)">
+            <input type="text" id="userInput" placeholder="Ask me anything in any language..." onkeypress="handleKey(event)">
             <button class="send-btn" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
-        // Updated API Key & Latest Working Model
+        // API Key & Model Configuration
         const DEFAULT_API_KEY = "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";
-        const MODEL_NAME = "openai/gpt-oss-120b";
+        const MODEL_NAME = "openai/gpt-oss-20b";
+
+        // Conversation history array to keep track of chat history/languages
+        let chatHistory = [
+            {"role": "system", "content": "You are Buraq AI, a friendly, multilingual smart buddy assistant capable of discussing history, languages, and general knowledge fluently in any language requested by the user."}
+        ];
 
         function handleKey(event) {
             if (event.key === 'Enter') {
@@ -142,7 +147,7 @@
 
             if (messageText === '') return;
 
-            // Display User Message
+            // Add user message to UI
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'message user-message';
             userMsgDiv.textContent = messageText;
@@ -150,6 +155,9 @@
 
             inputField.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Push user message to history
+            chatHistory.push({"role": "user", "content": messageText});
 
             // Display Thinking Message
             const aiMsgDiv = document.createElement('div');
@@ -167,17 +175,17 @@
                     },
                     body: JSON.stringify({
                         "model": MODEL_NAME,
-                        "messages": [
-                            {"role": "system", "content": "You are Buraq AI, a friendly, casual, smart buddy assistant."},
-                            {"role": "user", "content": messageText}
-                        ]
+                        "messages": chatHistory
                     })
                 });
 
                 const data = await response.json();
                 
                 if (data.choices && data.choices.length > 0) {
-                    aiMsgDiv.textContent = data.choices[0].message.content;
+                    const aiReply = data.choices[0].message.content;
+                    aiMsgDiv.textContent = aiReply;
+                    // Push assistant response to history
+                    chatHistory.push({"role": "assistant", "content": aiReply});
                 } else if (data.error) {
                     aiMsgDiv.textContent = "Error: " + (data.error.message || "Invalid API Key or Model");
                 } else {
